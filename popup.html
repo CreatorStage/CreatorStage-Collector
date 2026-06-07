@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>YT Creator Collector</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    /* Premium Theme Variable definitions matching YT-PLATAFORM */
+    :root {
+      --yt-bg-primary: #0b0b0b;
+      --yt-bg-surface: #1c1c1c;
+      --yt-bg-elevated: #242424;
+      --yt-bg-overlay: #383838;
+      --yt-red: #ff5045;
+      --yt-red-hover: #ff3f33;
+      --yt-text-primary: #f1f1f1;
+      --yt-text-secondary: #aaaaaa;
+      --yt-text-disabled: #717171;
+      --yt-blue: #3ea6ff;
+      --yt-green: #66bb6a;
+      --yt-font-sans: "Montserrat", "Roboto", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 360px;
+      background-color: var(--yt-bg-primary);
+      color: var(--yt-text-primary);
+      font-family: var(--yt-font-sans);
+      font-size: 13px;
+      line-height: 1.4;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--yt-bg-primary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--yt-bg-overlay);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--yt-text-disabled);
+    }
+
+    /* Container */
+    .container {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      min-height: 480px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--yt-bg-overlay);
+      margin-bottom: 16px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      color: var(--yt-red);
+      font-size: 24px;
+    }
+
+    .logo-text {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #fff 40%, var(--yt-text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      color: var(--yt-text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-icon:hover {
+      color: var(--yt-text-primary);
+      background-color: var(--yt-bg-surface);
+    }
+
+    /* Alert Banner */
+    .alert {
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      display: none;
+      align-items: flex-start;
+      gap: 8px;
+      border: 1px solid transparent;
+    }
+
+    .alert-error {
+      background-color: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    .alert-success {
+      background-color: rgba(102, 187, 106, 0.1);
+      border-color: rgba(102, 187, 106, 0.2);
+      color: #81c784;
+    }
+
+    .alert-info {
+      background-color: rgba(62, 166, 255, 0.1);
+      border-color: rgba(62, 166, 255, 0.2);
+      color: #90caf9;
+    }
+
+    /* Screen management */
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--yt-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .input-control {
+      width: 100%;
+      background-color: var(--yt-bg-surface);
+      border: 1px solid var(--yt-bg-overlay);
+      color: var(--yt-text-primary);
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-control:focus {
+      border-color: var(--yt-red);
+      background-color: var(--yt-bg-elevated);
+    }
+
+    /* Select Dropdown */
+    select.input-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23aaaaaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 16px;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background-color: var(--yt-red);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(255, 80, 69, 0.2);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--yt-red-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--yt-bg-overlay);
+      color: var(--yt-text-primary);
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--yt-bg-surface);
+      border-color: var(--yt-text-secondary);
+    }
+
+    /* Checkbox list */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-group input {
+      accent-color: var(--yt-red);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* Video Details Card */
+    .video-card {
+      background-color: var(--yt-bg-surface);
+      border: 1px solid var(--yt-bg-overlay);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .video-card:hover {
+      border-color: var(--yt-text-secondary);
+    }
+
+    .thumbnail-container {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background-color: #000;
+      position: relative;
+    }
+
+    .thumbnail-img {
+      width: 100%;
+      height: 100%;
+      object-cover: cover;
+    }
+
+    .thumbnail-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background-color: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .video-info {
+      padding: 12px;
+    }
+
+    .video-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--yt-text-primary);
+      line-clamp: 2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+
+    .video-channel {
+      font-size: 11px;
+      color: var(--yt-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Tab Switcher */
+    .tab-switcher {
+      display: flex;
+      border-bottom: 1px solid var(--yt-bg-overlay);
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--yt-text-secondary);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 12px;
+      padding: 8px 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tab-btn.active {
+      color: var(--yt-red);
+      border-bottom-color: var(--yt-red);
+    }
+
+    .tab-btn:hover {
+      color: var(--yt-text-primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Footer & Status Info */
+    .user-footer {
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--yt-bg-overlay);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--yt-text-secondary);
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: var(--yt-text-primary);
+    }
+
+    /* Loader */
+    .spinner {
+      animation: spin 1s linear infinite;
+      font-size: 16px;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(11, 11, 11, 0.85);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border-radius: 8px;
+    }
+
+    .loading-text {
+      font-weight: 600;
+      color: var(--yt-text-primary);
+    }
+
+    /* Settings view inside popup */
+    .settings-panel {
+      border: 1px solid var(--yt-bg-overlay);
+      background-color: var(--yt-bg-surface);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-container">
+        <span class="material-icons logo-icon">smart_display</span>
+        <span class="logo-text">Creator Core</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-settings" class="btn-icon" title="Configurações da API">
+          <span class="material-icons" style="font-size: 18px;">settings</span>
+        </button>
+        <button id="btn-logout" class="btn-icon" title="Sair" style="display: none;">
+          <span class="material-icons" style="font-size: 18px;">logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Global Alert box -->
+    <div id="global-alert" class="alert">
+      <span id="alert-icon" class="material-icons" style="font-size: 16px;">error</span>
+      <span id="alert-message"></span>
+    </div>
+
+    <!-- API Settings Panel (collapsible) -->
+    <div id="settings-panel" class="settings-panel">
+      <div class="form-group" style="margin-bottom: 8px;">
+        <label for="server-url">Servidor API Backend</label>
+        <input type="url" id="server-url" class="input-control" value="http://localhost:8080"
+          placeholder="ex: http://localhost:8080">
+      </div>
+      <button id="btn-save-settings" class="btn-primary" style="padding: 8px; font-size: 11px; width: 100%;">
+        Salvar Configuração
+      </button>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+      <span class="material-icons spinner" style="font-size: 32px; color: var(--yt-red);">sync</span>
+      <span class="loading-text">Carregando dados...</span>
+    </div>
+
+    <!-- SCREEN 1: LOGIN SCREEN -->
+    <main id="screen-login" class="screen active">
+      <div style="margin: 10px 0 20px 0; text-align: center;">
+        <h3 style="font-weight: 700; margin-bottom: 6px; font-size: 15px;">Acesse sua Conta</h3>
+        <p style="color: var(--yt-text-secondary); font-size: 12px;">Conecte-se para sincronizar suas referências e
+          ideias.</p>
+      </div>
+
+      <form id="form-login" onsubmit="return false;">
+        <div class="form-group">
+          <label for="login-email">E-mail</label>
+          <input type="email" id="login-email" class="input-control" required placeholder="seuemail@exemplo.com">
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="login-password">Senha</label>
+          <input type="password" id="login-password" class="input-control" required placeholder="Sua senha">
+        </div>
+        <button type="submit" id="btn-login-submit" class="btn-primary" style="width: 100%;">
+          Conectar
+        </button>
+      </form>
+    </main>
+
+    <!-- SCREEN 2: MAIN COLLECTOR SCREEN -->
+    <main id="screen-collector" class="screen">
+      <!-- YouTube Video Info Card -->
+      <div id="yt-detect-warning"
+        style="padding: 24px; text-align: center; border: 1px dashed var(--yt-bg-overlay); border-radius: 8px; margin-bottom: 16px;">
+        <span class="material-icons"
+          style="font-size: 40px; color: var(--yt-text-disabled); margin-bottom: 8px;">link_off</span>
+        <h4 style="font-weight: 700; margin-bottom: 4px;">Nenhum vídeo aberto</h4>
+        <p style="color: var(--yt-text-secondary); font-size: 11px;">Abra um vídeo no YouTube (URL contendo /watch) para
+          poder salvá-lo no Creator Core.</p>
+      </div>
+
+      <div id="yt-video-card" class="video-card" style="display: none;">
+        <div class="thumbnail-container">
+          <img id="video-thumb" class="thumbnail-img" src="" alt="Thumbnail do Vídeo">
+          <span class="thumbnail-badge">YouTube</span>
+        </div>
+        <div class="video-info">
+          <h4 id="video-title" class="video-title">Título do Vídeo do YouTube</h4>
+          <div class="video-channel">
+            <span class="material-icons" style="font-size: 12px; color: var(--yt-red);">play_circle</span>
+            <span id="video-channel">Nome do Canal</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel -->
+      <div id="collector-actions" style="display: none;">
+        <!-- Channels list selection -->
+        <div class="form-group">
+          <label for="select-channel">Selecione o Canal Destino</label>
+          <select id="select-channel" class="input-control">
+            <option value="">Carregando canais...</option>
+          </select>
+        </div>
+
+        <!-- Tab Switcher for Action Mode -->
+        <div class="tab-switcher">
+          <button id="tab-existente" class="tab-btn active">Adicionar como Referência</button>
+          <button id="tab-nova" class="tab-btn">Nova Ideia de Vídeo</button>
+          <button id="tab-canal" class="tab-btn">Salvar no Canal</button>
+        </div>
+
+        <!-- MODE 1: Existente (Adicionar a uma ideia existente) -->
+        <div id="mode-existente" class="tab-content active">
+          <div class="form-group">
+            <label for="select-idea">Selecione a Ideia de Vídeo</label>
+            <select id="select-idea" class="input-control">
+              <option value="">Selecione um canal primeiro...</option>
+            </select>
+          </div>
+
+          <!-- Reference Type selection options -->
+          <div style="margin: 12px 0;">
+            <label style="margin-bottom: 8px; display: block;">Opções de Salvamento</label>
+            <label class="checkbox-group">
+              <input type="checkbox" id="save-link" checked>
+              <span>Salvar Link de Referência</span>
+            </label>
+            <label class="checkbox-group">
+              <input type="checkbox" id="save-thumb" checked>
+              <span>Salvar Thumbnail na Galeria (Imagem)</span>
+            </label>
+          </div>
+
+          <button id="btn-save-reference" class="btn-primary" style="width: 100%; margin-top: 8px;">
+            <span class="material-icons" style="font-size: 16px;">bookmark_add</span>
+            Salvar Referência
+          </button>
+        </div>
+
+        <!-- MODE 2: Nova Ideia (Criar nova ideia baseada no vídeo) -->
+        <div id="mode-nova" class="tab-content">
+          <div class="form-group">
+            <label for="new-idea-title">Título Principal da Ideia</label>
+            <input type="text" id="new-idea-title" class="input-control" placeholder="Título da ideia de vídeo">
+          </div>
+          <div class="form-group">
+            <label for="new-idea-description">Descrição/Anotações Rápidas</label>
+            <textarea id="new-idea-description" class="input-control" style="resize: none; height: 52px;"
+              placeholder="Adicione observações sobre a ideia..."></textarea>
+          </div>
+
+          <div style="margin: 10px 0;">
+            <label class="checkbox-group">
+              <input type="checkbox" id="new-idea-link" checked>
+              <span>Anexar Link como Referência</span>
+            </label>
+            <label class="checkbox-group">
+              <input type="checkbox" id="new-idea-thumb" checked>
+              <span>Enviar Thumbnail para Moodboard</span>
+            </label>
+          </div>
+
+          <button id="btn-create-idea" class="btn-primary" style="width: 100%; margin-top: 8px;">
+            <span class="material-icons" style="font-size: 16px;">add_circle</span>
+            Criar Ideia e Anexar
+          </button>
+        </div>
+
+        <!-- MODE 3: Canal (Salvar no Canal diretamente) -->
+        <div id="mode-canal" class="tab-content">
+          <div class="form-group">
+            <label for="canal-title">Título da Referência</label>
+            <input type="text" id="canal-title" class="input-control" placeholder="Título da referência">
+          </div>
+          <div class="form-group">
+            <label for="canal-note">Observação Opcional</label>
+            <textarea id="canal-note" class="input-control" style="resize: none; height: 52px;"
+              placeholder="Adicione observações..."></textarea>
+          </div>
+
+          <div style="margin: 10px 0;">
+            <div class="form-group">
+              <label>Tipo de Inspiração</label>
+              <select id="canal-reference-type" class="input-control" style="margin-top: 4px;">
+                <option value="LINK">Link (Referência Geral)</option>
+                <option value="THUMBNAIL">Thumbnail de Inspiração</option>
+                <option value="TITLE">Título de Inspiração</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="btn-save-canal" class="btn-primary" style="width: 100%; margin-top: 8px;">
+            <span class="material-icons" style="font-size: 16px;">link</span>
+            Salvar no Canal
+          </button>
+        </div>
+      </div>
+
+      <!-- User footer info -->
+      <div class="user-footer">
+        <div>
+          Conectado como <span id="user-display-email" class="user-name">...</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

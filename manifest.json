@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "YT Creator Collector",
+  "version": "1.0.0",
+  "description": "Coleta vídeos do YouTube como referências ou ideias para a plataforma YT-PLATAFORM.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.youtube.com/*",
+    "http://localhost:8080/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ]
+}
