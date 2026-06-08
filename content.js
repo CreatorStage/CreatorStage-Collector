@@ -170,20 +170,20 @@ function injectChannelPageButton() {
 }
 
 async function handleChannelPageClick(btnElement) {
-  const handleEl = document.querySelector('yt-content-metadata-view-model span[dir="auto"]');
+  const handleEl = document.querySelector('yt-content-metadata-view-model span[dir="auto"]') || document.querySelector('#channel-handle');
   const handle = handleEl ? handleEl.textContent.trim() : "";
 
-  const nameEl = document.querySelector('h1.dynamicTextViewModelH1');
+  const nameEl = document.querySelector('h1.dynamicTextViewModelH1') || document.querySelector('yt-dynamic-text-view-model h1') || document.querySelector('#channel-name .ytd-channel-name');
   const channelName = nameEl ? nameEl.textContent.trim() : "YouTube Channel";
 
-  const subsEl = document.querySelector('yt-content-metadata-view-model span[aria-label*="inscritos"]');
+  const subsEl = document.querySelector('yt-content-metadata-view-model span[aria-label*="inscritos"]') || document.querySelector('#subscriber-count');
   const subs = subsEl ? subsEl.textContent.trim() : "";
 
-  const photoEl = document.querySelector('yt-decorated-avatar-view-model img');
+  const photoEl = document.querySelector('yt-decorated-avatar-view-model img') || document.querySelector('yt-page-header-profile-picture-renderer img') || document.querySelector('#channel-header img') || document.querySelector('#avatar img') || document.querySelector('.yt-page-header-avatar img');
   const photoUrl = photoEl ? photoEl.src : "";
 
-  const descEl = document.querySelector('yt-description-preview-view-model truncated-text-content');
-  const description = descEl ? descEl.textContent.trim().replace("…mais", "").trim() : "";
+  const descEl = document.querySelector('yt-description-preview-view-model truncated-text-content') || document.querySelector('#description-container');
+  const description = descEl ? descEl.textContent.trim().replace("…mais", "").replace("...more", "").trim() : "";
 
   const url = window.location.href.split('/videos')[0].split('/shorts')[0].split('/streams')[0].split('/community')[0];
   const titleStr = handle ? `[Canal] ${channelName} (${handle})` : `[Canal] ${channelName}`;

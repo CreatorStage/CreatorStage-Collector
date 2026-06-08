@@ -1,0 +1,12 @@
+# Pacotes e builds da extensão
+*.crx
+*.pem
+*.zip
+*.tar.gz
+
+# IDEs e logs de sistema
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
