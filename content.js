@@ -170,19 +170,21 @@ function injectChannelPageButton() {
 }
 
 async function handleChannelPageClick(btnElement) {
-  const handleEl = document.querySelector('yt-content-metadata-view-model span[dir="auto"]') || document.querySelector('#channel-handle');
+  const activePage = btnElement.closest('ytd-browse') || btnElement.closest('yt-page-header-view-model') || document;
+
+  const handleEl = activePage.querySelector('yt-content-metadata-view-model span[dir="auto"]') || activePage.querySelector('#channel-handle');
   const handle = handleEl ? handleEl.textContent.trim() : "";
 
-  const nameEl = document.querySelector('h1.dynamicTextViewModelH1') || document.querySelector('yt-dynamic-text-view-model h1') || document.querySelector('#channel-name .ytd-channel-name');
+  const nameEl = activePage.querySelector('h1.dynamicTextViewModelH1') || activePage.querySelector('yt-dynamic-text-view-model h1') || activePage.querySelector('#channel-name .ytd-channel-name');
   const channelName = nameEl ? nameEl.textContent.trim() : "YouTube Channel";
 
-  const subsEl = document.querySelector('yt-content-metadata-view-model span[aria-label*="inscritos"]') || document.querySelector('#subscriber-count');
+  const subsEl = activePage.querySelector('yt-content-metadata-view-model span[aria-label*="inscritos"]') || activePage.querySelector('#subscriber-count');
   const subs = subsEl ? subsEl.textContent.trim() : "";
 
-  const photoEl = document.querySelector('yt-decorated-avatar-view-model img') || document.querySelector('yt-page-header-profile-picture-renderer img') || document.querySelector('#channel-header img') || document.querySelector('#avatar img') || document.querySelector('.yt-page-header-avatar img');
+  const photoEl = activePage.querySelector('yt-decorated-avatar-view-model img') || activePage.querySelector('yt-page-header-profile-picture-renderer img') || activePage.querySelector('#channel-header img') || activePage.querySelector('#avatar img') || activePage.querySelector('.yt-page-header-avatar img');
   const photoUrl = photoEl ? photoEl.src : "";
 
-  const descEl = document.querySelector('yt-description-preview-view-model truncated-text-content') || document.querySelector('#description-container');
+  const descEl = activePage.querySelector('yt-description-preview-view-model truncated-text-content') || activePage.querySelector('#description-container');
   const description = descEl ? descEl.textContent.trim().replace("…mais", "").replace("...more", "").trim() : "";
 
   const url = window.location.href.split('/videos')[0].split('/shorts')[0].split('/streams')[0].split('/community')[0];
@@ -471,7 +473,7 @@ function renderLoginForm() {
     <div style="text-align: center; margin-bottom: 16px;">
       <p style="font-size: 12px; color: #aaaaaa;">Conecte-se com sua conta para salvar.</p>
     </div>
-    <form id="cc-login-form" onsubmit="return false;">
+    <form id="cc-login-form">
       <div class="cc-form-group">
         <label class="cc-label">E-mail</label>
         <input type="email" id="cc-login-email" class="cc-input" required placeholder="seuemail@exemplo.com">
