@@ -201,7 +201,10 @@ async function handleChannelPageClick(btnElement) {
 
   try {
     const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken"]);
-    const apiBaseUrl = storage.apiBaseUrl || "http://localhost:8080";
+    let apiBaseUrl = storage.apiBaseUrl || "http://localhost:8080";
+    if (apiBaseUrl.startsWith("http://api.creatorsdeck.site")) {
+      apiBaseUrl = apiBaseUrl.replace("http://", "https://");
+    }
     const jwtToken = storage.jwtToken;
 
     if (!jwtToken) {
@@ -394,7 +397,12 @@ async function openModal(videoInfo) {
 
   // Load configuration
   const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken"]);
-  if (storage.apiBaseUrl) apiBaseUrl = storage.apiBaseUrl;
+  if (storage.apiBaseUrl) {
+    apiBaseUrl = storage.apiBaseUrl;
+    if (apiBaseUrl.startsWith("http://api.creatorsdeck.site")) {
+      apiBaseUrl = apiBaseUrl.replace("http://", "https://");
+    }
+  }
   jwtToken = storage.jwtToken || null;
 
   // Create Modal Overlay

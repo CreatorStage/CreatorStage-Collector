@@ -63,7 +63,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 1. Load settings from local storage
   const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken"]);
   if (storage.apiBaseUrl) {
-    apiBaseUrl = storage.apiBaseUrl;
+    let storedUrl = storage.apiBaseUrl;
+    if (storedUrl.startsWith("http://api.creatorsdeck.site")) {
+      storedUrl = storedUrl.replace("http://", "https://");
+      chrome.storage.local.set({ apiBaseUrl: storedUrl });
+    }
+    apiBaseUrl = storedUrl;
     serverUrlInput.value = apiBaseUrl;
   }
 
@@ -92,7 +97,13 @@ function setupEventListeners() {
 
   // Save Settings
   btnSaveSettings.addEventListener("click", async () => {
-    const url = serverUrlInput.value.trim().replace(/\/$/, ""); // remove trailing slash
+    let url = serverUrlInput.value.trim().replace(/\/$/, ""); // remove trailing slash
+    
+    // Auto-fix http to https for the production API
+    if (url.startsWith("http://api.creatorsdeck.site")) {
+      url = url.replace("http://", "https://");
+    }
+    
     if (!url) return showAlert("error", "O endereço do servidor não pode ser vazio.");
 
     apiBaseUrl = url;
