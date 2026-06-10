@@ -208,7 +208,7 @@ async function handleChannelPageClick(btnElement) {
     const jwtToken = storage.jwtToken;
 
     if (!jwtToken) {
-      alert("CreatorStage: Por favor, faça login na extensão primeiro.");
+      alert("CreatorsDeck: Por favor, faça login na extensão primeiro.");
       throw new Error("No token");
     }
 
@@ -234,7 +234,7 @@ async function handleChannelPageClick(btnElement) {
     });
 
     if (!channelsResponse || channelsResponse.length === 0) {
-      alert("CreatorStage: Você precisa criar pelo menos um canal no painel antes de salvar.");
+      alert("CreatorsDeck: Você precisa criar pelo menos um canal no painel antes de salvar.");
       throw new Error("No channels");
     }
 
@@ -284,7 +284,7 @@ async function handleChannelPageClick(btnElement) {
   } catch (err) {
     console.error(err);
     if (err.message !== "No token" && err.message !== "No channels") {
-      alert("CreatorStage Erro: " + err.message);
+      alert("CreatorsDeck Erro: " + err.message);
     }
     textElement.innerHTML = "Erro ao Salvar";
     btnElement.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
