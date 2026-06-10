@@ -55,10 +55,8 @@ const modeExistente = document.getElementById("mode-existente");
 const modeNova = document.getElementById("mode-nova");
 const modeCanal = document.getElementById("mode-canal");
 
-const canalTitleInput = document.getElementById("canal-title");
-const canalNoteInput = document.getElementById("canal-note");
-const canalReferenceTypeSelect = document.getElementById("canal-reference-type");
-const btnSaveCanal = document.getElementById("btn-save-canal");
+const btnSaveCanalThumb = document.getElementById("btn-save-canal-thumb");
+const btnSaveCanalTitle = document.getElementById("btn-save-canal-title");
 
 // Initialize extension popup
 document.addEventListener("DOMContentLoaded", async () => {
@@ -135,7 +133,8 @@ function setupEventListeners() {
   btnCreateIdea.addEventListener("click", handleCreateIdea);
 
   // Save directly to Channel Action
-  btnSaveCanal.addEventListener("click", handleSaveCanal);
+  btnSaveCanalThumb.addEventListener("click", () => handleSaveCanalDirect("THUMBNAIL"));
+  btnSaveCanalTitle.addEventListener("click", () => handleSaveCanalDirect("TITLE"));
 }
 
 // Show/Hide Screens
@@ -440,17 +439,18 @@ function displayDetectedVideo(videoData) {
     videoThumb.style.borderRadius = "50%";
     videoThumb.style.width = "56px";
     videoThumb.style.height = "56px";
+    videoThumb.style.aspectRatio = "1/1";
     videoThumb.style.objectFit = "cover";
   } else {
-    videoThumb.style.borderRadius = "8px";
-    videoThumb.style.width = "100%";
+    videoThumb.style.borderRadius = "4px";
+    videoThumb.style.width = "110px";
     videoThumb.style.height = "auto";
+    videoThumb.style.aspectRatio = "16/9";
     videoThumb.style.objectFit = "cover";
   }
 
   // Prefill new idea input with the video's title
   newIdeaTitleInput.value = videoData.title;
-  canalTitleInput.value = videoData.title;
 }
 
 function showYouTubeWarning(show) {
@@ -592,24 +592,19 @@ async function handleCreateIdea() {
 }
 
 // Save reference directly to channel
-async function handleSaveCanal() {
+async function handleSaveCanalDirect(refType) {
   const channelId = selectChannel.value;
   if (!channelId) {
     return showAlert("error", "Selecione um canal destino.");
   }
 
-  const title = canalTitleInput.value.trim();
-  if (!title) {
-    return showAlert("error", "Digite o título da referência.");
-  }
-
-  const note = canalNoteInput.value.trim();
-  const refType = canalReferenceTypeSelect.value;
+  const title = currentVideo.title;
+  const note = "";
   
   const isChannel = currentVideo.type === "channel";
   let payloadNote = note;
   if (isChannel) {
-    payloadNote = `Inscritos: ${currentVideo.subs}\nDescrição: ${currentVideo.description}${note ? '\n\n' + note : ''}`;
+    payloadNote = `Inscritos: ${currentVideo.subs}\nDescrição: ${currentVideo.description}`;
   }
   const thumbUrl = isChannel ? currentVideo.photoUrl : `https://img.youtube.com/vi/${currentVideo.videoId}/maxresdefault.jpg`;
 
@@ -635,9 +630,6 @@ async function handleSaveCanal() {
     if (!response.ok) {
       throw new Error("Erro ao salvar referência no canal.");
     }
-
-    // Reset fields
-    canalNoteInput.value = "";
 
     showAlert("success", "Referência salva no canal com sucesso!");
     setTimeout(window.close, 1500); // Close popup
