@@ -61,7 +61,7 @@ const btnSaveCanalTitle = document.getElementById("btn-save-canal-title");
 // Initialize extension popup
 document.addEventListener("DOMContentLoaded", async () => {
   // 1. Load settings from local storage
-  const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken"]);
+  const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken", "savedEmail"]);
   if (storage.apiBaseUrl) {
     let storedUrl = storage.apiBaseUrl;
     if (storedUrl.startsWith("http://api.creatorsdeck.site")) {
@@ -70,6 +70,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     apiBaseUrl = storedUrl;
     serverUrlInput.value = apiBaseUrl;
+  }
+
+  if (storage.savedEmail) {
+    loginEmailInput.value = storage.savedEmail;
   }
 
   if (storage.jwtToken) {
@@ -263,10 +267,9 @@ async function handleLogin(e) {
     if (response.ok) {
       const data = await response.json();
       jwtToken = data.token;
-      await chrome.storage.local.set({ jwtToken });
+      await chrome.storage.local.set({ jwtToken, savedEmail: email });
 
-      // Prefill login input values off
-      loginEmailInput.value = "";
+      // Prefill login input values off (keep email)
       loginPasswordInput.value = "";
 
       await validateTokenAndInit();
