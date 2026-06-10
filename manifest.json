@@ -11,6 +11,7 @@
   "host_permissions": [
     "https://*.youtube.com/*",
     "http://localhost:8080/*",
+    "https://api.creatorsdeck.site/*",
     "http://192.168.15.7:*/*",
     "http://*.local:*/*"
   ],
