@@ -292,22 +292,28 @@ select.cc-input {
   display: flex !important;
   border-bottom: 1px solid #383838 !important;
   margin-bottom: 14px !important;
-  gap: 12px !important;
+  gap: 4px !important;
 }
 
 .cc-tab-btn {
+  flex: 1 !important;
   background: transparent !important;
   border: none !important;
   border-bottom: 2px solid transparent !important;
   color: #aaaaaa !important;
   font-family: inherit !important;
   font-weight: 600 !important;
-  font-size: 11px !important;
+  font-size: 10px !important;
   padding: 8px 4px !important;
   cursor: pointer !important;
   transition: all 0.2s !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  min-height: 48px !important;
 }
 
 .cc-tab-btn.active {

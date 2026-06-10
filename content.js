@@ -201,7 +201,10 @@ async function handleChannelPageClick(btnElement) {
 
   try {
     const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken"]);
-    const apiBaseUrl = storage.apiBaseUrl || "http://localhost:8080";
+    let apiBaseUrl = storage.apiBaseUrl || "http://localhost:8080";
+    if (apiBaseUrl.startsWith("http://api.creatorsdeck.site")) {
+      apiBaseUrl = apiBaseUrl.replace("http://", "https://");
+    }
     const jwtToken = storage.jwtToken;
 
     if (!jwtToken) {
@@ -394,7 +397,12 @@ async function openModal(videoInfo) {
 
   // Load configuration
   const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken"]);
-  if (storage.apiBaseUrl) apiBaseUrl = storage.apiBaseUrl;
+  if (storage.apiBaseUrl) {
+    apiBaseUrl = storage.apiBaseUrl;
+    if (apiBaseUrl.startsWith("http://api.creatorsdeck.site")) {
+      apiBaseUrl = apiBaseUrl.replace("http://", "https://");
+    }
+  }
   jwtToken = storage.jwtToken || null;
 
   // Create Modal Overlay
@@ -530,12 +538,14 @@ async function renderCollectorForm() {
       <button id="cc-tab-canal" class="cc-tab-btn">Salvar no Canal</button>
     </div>
 
+    <!-- Canal (Global, shared between all tabs) -->
+    <div class="cc-form-group">
+      <label class="cc-label">Canal Destino</label>
+      <select id="cc-select-channel" class="cc-input"></select>
+    </div>
+
     <!-- TAB 1: Existente -->
     <div id="cc-panel-existente" class="cc-tab-content active">
-      <div class="cc-form-group">
-        <label class="cc-label">Canal</label>
-        <select id="cc-select-channel" class="cc-input"></select>
-      </div>
       <div class="cc-form-group">
         <label class="cc-label">Selecione a Ideia</label>
         <select id="cc-select-idea" class="cc-input">
@@ -580,29 +590,16 @@ async function renderCollectorForm() {
 
     <!-- TAB 3: Salvar no Canal -->
     <div id="cc-panel-canal" class="cc-tab-content">
-      <div class="cc-form-group">
-        <label class="cc-label">Canal</label>
-        <select id="cc-select-channel-canal" class="cc-input"></select>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
+        <button id="cc-btn-save-canal-thumb" class="cc-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          Salvar Thumb
+        </button>
+        <button id="cc-btn-save-canal-title" class="cc-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>
+          Salvar Título
+        </button>
       </div>
-      <div class="cc-form-group">
-        <label class="cc-label">Título da Referência</label>
-        <input type="text" id="cc-canal-title" class="cc-input" value="${activeModalVideo.title}">
-      </div>
-      <div class="cc-form-group">
-        <label class="cc-label">Observação opcional</label>
-        <textarea id="cc-canal-note" class="cc-input" style="height: 52px; resize: none;" placeholder="O que observar nessa referência..."></textarea>
-      </div>
-      <div style="margin: 10px 0;">
-        <div class="cc-form-group">
-          <label class="cc-label">Tipo de Inspiração</label>
-          <select id="cc-canal-reference-type" class="cc-input" style="margin-top: 4px;">
-            <option value="LINK">Link (Referência Geral)</option>
-            <option value="THUMBNAIL">Thumbnail de Inspiração</option>
-            <option value="TITLE">Título de Inspiração</option>
-          </select>
-        </div>
-      </div>
-      <button id="cc-btn-save-canal" class="cc-btn">Salvar no Canal</button>
     </div>
     
     <button id="cc-btn-modal-logout" class="cc-btn-secondary" style="font-size: 11px; padding: 6px; margin-top: 10px;">
@@ -681,16 +678,15 @@ function setupModalTabs() {
   // Action Buttons
   document.getElementById("cc-btn-save-ref").addEventListener("click", handleModalSaveRef);
   document.getElementById("cc-btn-create-idea").addEventListener("click", handleModalCreateIdea);
-  document.getElementById("cc-btn-save-canal").addEventListener("click", handleModalSaveCanal);
+  document.getElementById("cc-btn-save-canal-thumb").addEventListener("click", () => handleModalSaveCanalDirect("THUMBNAIL"));
+  document.getElementById("cc-btn-save-canal-title").addEventListener("click", () => handleModalSaveCanalDirect("TITLE"));
 }
 
 // Populate Channels Dropdown
 function populateModalChannels() {
   const selectCh = document.getElementById("cc-select-channel");
-  const selectChCanal = document.getElementById("cc-select-channel-canal");
   if (currentChannels.length === 0) {
     if (selectCh) selectCh.innerHTML = '<option value="">Nenhum canal cadastrado</option>';
-    if (selectChCanal) selectChCanal.innerHTML = '<option value="">Nenhum canal cadastrado</option>';
     return;
   }
 
@@ -704,13 +700,10 @@ function populateModalChannels() {
       if (channelId) {
         await fetchModalIdeas(channelId);
       } else {
-        document.getElementById("cc-select-idea").innerHTML = '<option value="">Selecione um canal...</option>';
+        const selectId = document.getElementById("cc-select-idea");
+        if (selectId) selectId.innerHTML = '<option value="">Selecione um canal...</option>';
       }
     });
-  }
-
-  if (selectChCanal) {
-    selectChCanal.innerHTML = optionsHtml;
   }
 
   // Auto-select first channel
@@ -719,9 +712,6 @@ function populateModalChannels() {
     if (selectCh) {
       selectCh.value = defaultChannelId;
       fetchModalIdeas(defaultChannelId);
-    }
-    if (selectChCanal) {
-      selectChCanal.value = defaultChannelId;
     }
   }
 }
@@ -860,22 +850,16 @@ async function handleModalCreateIdea() {
 }
 
 // Save directly to Channel flow
-async function handleModalSaveCanal() {
-  const selectChCanal = document.getElementById("cc-select-channel-canal");
-  const selectedChannel = selectChCanal.value;
+async function handleModalSaveCanalDirect(refType) {
+  const selectCh = document.getElementById("cc-select-channel");
+  const selectedChannel = selectCh.value;
 
   if (!selectedChannel) {
     return showModalAlert("error", "Selecione o canal de destino.");
   }
 
-  const titleInput = document.getElementById("cc-canal-title");
-  const title = titleInput.value.trim();
-  if (!title) {
-    return showModalAlert("error", "Digite um título para a referência.");
-  }
-
-  const note = document.getElementById("cc-canal-note").value.trim();
-  const typeVal = document.getElementById("cc-canal-reference-type").value;
+  const title = activeModalVideo.title;
+  const note = "";
 
   toggleModalLoader(true);
   hideModalAlert();
@@ -884,7 +868,7 @@ async function handleModalSaveCanal() {
     const isChannel = activeModalVideo.type === "channel";
     let payloadNote = note;
     if (isChannel) {
-      payloadNote = `Inscritos: ${activeModalVideo.subs}\nDescrição: ${activeModalVideo.description}${note ? '\n\n' + note : ''}`;
+      payloadNote = `Inscritos: ${activeModalVideo.subs}\nDescrição: ${activeModalVideo.description}`;
     }
 
     await apiFetch(`/api/channels/${selectedChannel}/references`, {
@@ -894,7 +878,7 @@ async function handleModalSaveCanal() {
         url: activeModalVideo.url,
         note: payloadNote,
         thumbnailUrl: isChannel ? activeModalVideo.photoUrl : `https://img.youtube.com/vi/${activeModalVideo.videoId}/maxresdefault.jpg`,
-        type: typeVal
+        type: refType
       })
     });
 
