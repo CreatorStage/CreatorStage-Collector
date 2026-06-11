@@ -483,8 +483,8 @@ function renderLoginForm() {
     </div>
     <form id="cc-login-form">
       <div class="cc-form-group">
-        <label class="cc-label">E-mail</label>
-        <input type="email" id="cc-login-email" class="cc-input" required placeholder="seuemail@exemplo.com">
+        <label class="cc-label">Usuário</label>
+        <input type="text" id="cc-login-username" class="cc-input" required placeholder="Seu username">
       </div>
       <div class="cc-form-group" style="margin-bottom: 18px;">
         <label class="cc-label">Senha</label>
@@ -500,7 +500,7 @@ function renderLoginForm() {
 // 6. Handle Login inside YouTube modal
 async function handleModalLogin(e) {
   e.preventDefault();
-  const email = document.getElementById("cc-login-email").value.trim();
+  const username = document.getElementById("cc-login-username").value.trim();
   const password = document.getElementById("cc-login-password").value;
 
   toggleModalLoader(true);
@@ -509,7 +509,7 @@ async function handleModalLogin(e) {
   try {
     const data = await apiFetch("/api/auth/login", {
       method: "POST",
-      body: { email, password }
+      body: { username, password }
     });
 
     jwtToken = data.token;
@@ -519,7 +519,7 @@ async function handleModalLogin(e) {
     await renderCollectorForm();
   } catch (err) {
     console.error(err);
-    showModalAlert("error", "E-mail ou senha incorretos.");
+    showModalAlert("error", "Usuário ou senha incorretos.");
   } finally {
     toggleModalLoader(false);
   }
