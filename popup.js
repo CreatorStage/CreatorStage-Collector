@@ -26,7 +26,7 @@ const btnSaveReference = document.getElementById("btn-save-reference");
 const btnCreateIdea = document.getElementById("btn-create-idea");
 
 const serverUrlInput = document.getElementById("server-url");
-const loginEmailInput = document.getElementById("login-email");
+const loginUsernameInput = document.getElementById("login-username");
 const loginPasswordInput = document.getElementById("login-password");
 
 const ytDetectWarning = document.getElementById("yt-detect-warning");
@@ -61,7 +61,7 @@ const btnSaveCanalTitle = document.getElementById("btn-save-canal-title");
 // Initialize extension popup
 document.addEventListener("DOMContentLoaded", async () => {
   // 1. Load settings from local storage
-  const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken", "savedEmail"]);
+  const storage = await chrome.storage.local.get(["apiBaseUrl", "jwtToken", "savedUsername"]);
   if (storage.apiBaseUrl) {
     let storedUrl = storage.apiBaseUrl;
     if (storedUrl.startsWith("http://api.creatorsdeck.site")) {
@@ -72,8 +72,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     serverUrlInput.value = apiBaseUrl;
   }
 
-  if (storage.savedEmail) {
-    loginEmailInput.value = storage.savedEmail;
+  if (storage.savedUsername) {
+    loginUsernameInput.value = storage.savedUsername;
   }
 
   if (storage.jwtToken) {
@@ -222,7 +222,7 @@ async function validateTokenAndInit() {
 
     if (response.ok) {
       currentUser = await response.json();
-      userDisplayEmail.innerText = currentUser.name || currentUser.email;
+      userDisplayEmail.innerText = currentUser.username || currentUser.email || "Usuário";
       showScreen("collector");
 
       // Load user channels and detect video
@@ -245,10 +245,10 @@ async function validateTokenAndInit() {
 // Authenticate user
 async function handleLogin(e) {
   e.preventDefault();
-  const email = loginEmailInput.value.trim();
+  const username = loginUsernameInput.value.trim();
   const password = loginPasswordInput.value;
 
-  if (!email || !password) {
+  if (!username || !password) {
     return showAlert("error", "Preencha todos os campos.");
   }
 
@@ -261,13 +261,13 @@ async function handleLogin(e) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ username, password })
     });
 
     if (response.ok) {
       const data = await response.json();
       jwtToken = data.token;
-      await chrome.storage.local.set({ jwtToken, savedEmail: email });
+      await chrome.storage.local.set({ jwtToken, savedUsername: username });
 
       // Prefill login input values off (keep email)
       loginPasswordInput.value = "";
@@ -275,7 +275,7 @@ async function handleLogin(e) {
       await validateTokenAndInit();
     } else {
       const errText = await response.text();
-      let msg = "E-mail ou senha incorretos.";
+      let msg = "Usuário ou senha incorretos.";
       try {
         const errJson = JSON.parse(errText);
         if (errJson.message) msg = errJson.message;
